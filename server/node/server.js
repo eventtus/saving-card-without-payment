@@ -32,14 +32,49 @@ app.get("/public-key", (req, res) => {
   res.send({ publicKey: process.env.STRIPE_PUBLISHABLE_KEY });
 });
 
+app.get("/payment-methods", async (req, res) => {
+  const paymentMethods = await stripe.paymentMethods.list({
+    customer: process.env.STRIPE_CUSTOMER_ID,
+    type: 'card',
+  });
+  res.send({paymentMethods: paymentMethods.data});
+});
+
 app.post("/create-setup-intent", async (req, res) => {
   // Create or use an existing Customer to associate with the SetupIntent.
   // The PaymentMethod will be stored to this Customer for later use.
-  const customer = await stripe.customers.create();
+  // const customer = await stripe.customers.create();
 
   res.send(await stripe.setupIntents.create({
-    customer: customer.id
+    customer: process.env.STRIPE_CUSTOMER_ID
   }));
+});
+
+app.post("/create-invoice-item", async (req, res) => {
+  res.send(await stripe.invoiceItems.create({
+    customer: process.env.STRIPE_CUSTOMER_ID,
+    price: process.env.STRIPE_PRICE_ID,
+  }));
+});
+
+app.post("/create-invoice", async (req, res) => {
+  res.send(await stripe.invoices.create({
+    customer: process.env.STRIPE_CUSTOMER_ID
+  }));
+});
+
+app.post("/finalize-invoice", async (req, res) => {
+  res.send(await stripe.invoices.finalizeInvoice(
+    req.body.invoiceId
+  ));
+});
+
+app.post("/pay-invoice", async (req, res) => {
+  res.send(
+    await stripe.invoices.pay(req.body.invoiceId, {
+      payment_method: req.body.payWith,
+    })
+  );
 });
 
 // Webhook handler for asynchronous events.
