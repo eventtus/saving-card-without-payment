@@ -31,7 +31,7 @@ body {
   max-width: 980px;
   padding: 48px;
   align-content: center;
-  justify-content: center;
+  justify-content: space-between;
   height: auto;
   min-height: 100vh;
   margin: 0 auto;
@@ -282,6 +282,19 @@ pre {
   transform-origin: 0px 10.2px;
   -webkit-animation: loading 2s infinite ease;
   animation: loading 2s infinite ease;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+}
+
+input[type="radio"] {
+  margin-right: 8px;
 }
 
 @-webkit-keyframes loading {
